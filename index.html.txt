@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Adiyogi Selfie | Isha Experience</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+body {
+font-family: 'Outfit', sans-serif;
+background: #050505;
+color: #ffffff;
+margin: 0;
+overflow: hidden;
+height: 100vh;
+}
+
+.gold-text {
+background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.nav-container {
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(15px);
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-radius: 20px;
+display: flex;
+padding: 4px;
+margin: 10px 15px;
+}
+
+.nav-tab {
+flex: 1;
+padding: 10px 2px;
+text-align: center;
+font-size: 10px;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+border-radius: 16px;
+cursor: pointer;
+color: rgba(255, 255, 255, 0.4);
+transition: 0.3s;
+}
+
+.nav-tab.active {
+background: rgba(245, 158, 11, 0.2);
+color: #f59e0b;
+}
+
+.main-canvas-area {
+position: relative;
+width: 90%;
+aspect-ratio: 1/1;
+margin: 10px auto;
+background: #111;
+border-radius: 24px;
+overflow: hidden;
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+#result-display {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: none;
+}
+
+.shiva-loader {
+position: absolute;
+inset: 0;
+background: rgba(0, 0, 0, 0.9);
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 100;
+}
+
+.ring {
+width: 50px;
+height: 50px;
+border: 3px solid transparent;
+border-top: 3px solid #f59e0b;
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-primary {
+background: linear-gradient(to right, #f59e0b, #ea580c);
+color: white;
+padding: 16px;
+border-radius: 18px;
+width: 90%;
+margin: 10px auto;
+display: block;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 1px;
+border: none;
+transition: opacity 0.3s;
+}
+
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.action-row {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+width: 90%;
+margin: 0 auto;
+}
+
+.btn-sub {
+background: rgba(255,255,255,0.05);
+color: #f59e0b;
+border: 1px solid rgba(245, 158, 11, 0.3);
+padding: 14px;
+border-radius: 14px;
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+.tab-content { display: none; height: calc(100vh - 200px); overflow-y: auto; }
+.tab-content.active { display: block; }
+
+.chat-box {
+background: rgba(255,255,255,0.03);
+border-radius: 20px;
+margin: 10px 15px;
+height: 300px;
+overflow-y: auto;
+padding: 15px;
+border: 1px solid rgba(255,255,255,0.05);
+}
+
+.bubble { padding: 10px 14px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; max-width: 85%; }
+.bot { background: rgba(255,255,255,0.07); color: #ccc; border-bottom-left-radius: 2px; }
+.user { background: #f59e0b; color: #000; margin-left: auto; font-weight: 600; border-bottom-right-radius: 2px; }
+
+.floating-retake {
+position: absolute;
+top: 10px;
+right: 10px;
+background: rgba(0,0,0,0.7);
+color: white;
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 10px;
+font-weight: bold;
+border: 1px solid rgba(255,255,255,0.2);
+z-index: 50;
+}
+
+.share-toast {
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background: #f59e0b;
+color: black;
+padding: 10px 20px;
+border-radius: 30px;
+font-weight: bold;
+font-size: 12px;
+display: none;
+z-index: 1000;
+}
+</style>
+</head>
+<body>
+
+<header class="pt-6 text-center">
+<h1 class="text-2xl font-black gold-text tracking-tighter">ADIYOGI VISION</h1>
+<p class="text-[8px] tracking-[4px] uppercase opacity-40">Virtual Experience 2026</p>
+</header>
+
+<div class="nav-container">
+<div id="t-selfie" class="nav-tab active" onclick="setView('selfie')">Selfie</div>
+<div id="t-poster" class="nav-tab" onclick="setView('poster')">AI Poster</div>
+<div id="t-guide" class="nav-tab" onclick="setView('guide')">Divine Guide</div>
+</div>
+
+<!-- SELFIE TAB -->
+<div id="view-selfie" class="tab-content active">
+<div class="main-canvas-area">
+<div id="loader" class="shiva-loader">
+<div class="ring"></div>
+<p id="loader-text" class="mt-4 text-[9px] font-bold uppercase tracking-widest text-amber-500">Manifesting Presence...</p>
+</div>
+
+<img id="result-display" alt="Preview">
+
+<div id="start-state" class="flex flex-col items-center justify-center h-full p-6 text-center">
+<i class="fas fa-camera-retro text-4xl text-amber-500/20 mb-4"></i>
+<p class="text-xs opacity-50 mb-6">Experience standing before the 112ft Adiyogi statue</p>
+<input type="file" id="img-input" accept="image/*" capture="user" class="hidden" onchange="handleFile(this)">
+<button onclick="document.getElementById('img-input').click()" class="bg-white text-black px-8 py-3 rounded-full font-bold text-xs uppercase shadow-xl">Open Camera</button>
+</div>
+
+<button id="retake-btn" class="hidden floating-retake" onclick="resetAll()">Retake</button>
+</div>
+
+<div id="actions" class="hidden flex flex-col gap-3">
+<div class="action-row">
+<button onclick="transform()" class="btn-sub"><i class="fas fa-wand-magic-sparkles"></i> Refine</button>
+<button onclick="downloadImg()" class="btn-sub"><i class="fas fa-cloud-arrow-down"></i> Save</button>
+</div>
+<button onclick="shareLink()" class="btn-sub w-[90%] mx-auto"><i class="fas fa-share-nodes"></i> Share Experience</button>
+</div>
+
+<button id="gen-btn" onclick="transform()" class="btn-primary" disabled>Generate Vision</button>
+</div>
+
+<!-- POSTER TAB -->
+<div id="view-poster" class="tab-content">
+<div class="main-canvas-area">
+<img id="poster-display" style="width:100%; height:100%; object-fit:cover; display:none;">
+<div id="p-empty" class="flex flex-col items-center justify-center h-full opacity-10">
+<i class="fas fa-palette text-5xl mb-2"></i>
+<p class="text-[10px] uppercase font-black">AI Poster Engine</p>
+</div>
+</div>
+<div class="px-4">
+<input id="p-input" type="text" placeholder="Adiyogi in a cosmic neon sky..." class="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-sm outline-none focus:border-amber-500">
+<button onclick="genPoster()" class="btn-primary mt-4">Create Art</button>
+</div>
+</div>
+
+<!-- GUIDE TAB -->
+<div id="view-guide" class="tab-content">
+<div id="chat-win" class="chat-box">
+<div class="bubble bot">Namaskaram. I am your Isha Guide. How can I help you today?</div>
+</div>
+<div class="px-4 flex gap-2">
+<input id="c-input" type="text" placeholder="Ask about Sadhana..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-xl text-sm outline-none">
+<button onclick="sendChat()" class="w-12 h-12 bg-amber-500 text-black rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+
+<div id="share-toast" class="share-toast">Link Copied to Clipboard!</div>
+
+<script>
+const apiKey = "";
+let userImg = null;
+
+function setView(v) {
+document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+document.getElementById('t-' + v).classList.add('active');
+document.getElementById('view-' + v).classList.add('active');
+}
+
+function handleFile(input) {
+if (input.files && input.files[0]) {
+const reader = new FileReader();
+reader.onload = (e) => {
+userImg = e.target.result.split(',')[1];
+const display = document.getElementById('result-display');
+display.src = e.target.result;
+display.style.display = 'block';
+document.getElementById('start-state').style.display = 'none';
+document.getElementById('gen-btn').disabled = false;
+document.getElementById('retake-btn').classList.remove('hidden');
+};
+reader.readAsDataURL(input.files[0]);
+}
+}
+
+function resetAll() {
+document.getElementById('result-display').style.display = 'none';
+document.getElementById('start-state').style.display = 'flex';
+document.getElementById('retake-btn').classList.add('hidden');
+document.getElementById('actions').classList.add('hidden');
+document.getElementById('gen-btn').disabled = true;
+document.getElementById('gen-btn').style.display = 'block';
+userImg = null;
+}
+
+async function transform() {
+const loader = document.getElementById('loader');
+const loaderText = document.getElementById('loader-text');
+loaderText.innerText = "Reconstructing Scene...";
+loader.style.display = 'flex';
+
+const prompt = `ADIYOGI SYNTHESIS:
+1. Keep the person from the image, specifically their face and expression.
+2. Remove all background pixels completely.
+3. Place the person at Isha Yoga Center in Coimbatore, standing in the courtyard.
+4. The 112-foot black steel Adiyogi statue must be towering in the background.
+5. Ensure the Adiyogi face, golden moon, and snake are clearly visible.
+6. Match lighting to a realistic outdoor pilgrimage setting.`;
+
+try {
+const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+contents: [{
+parts: [
+{ text: prompt },
+{ inlineData: { mimeType: "image/png", data: userImg } }
+]
+}],
+generationConfig: { responseModalities: ["IMAGE"] }
+})
+});
+const data = await res.json();
+const b64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+if (b64) {
+const display = document.getElementById('result-display');
+display.src = `data:image/png;base64,${b64}`;
+document.getElementById('actions').classList.remove('hidden');
+document.getElementById('gen-btn').style.display = 'none';
+}
+} catch (e) {
+console.error(e);
+}
+finally { loader.style.display = 'none'; }
+}
+
+function downloadImg() {
+const a = document.createElement('a');
+a.href = document.getElementById('result-display').src;
+a.download = 'Adiyogi_Selfie.png';
+a.click();
+}
+
+function shareLink() {
+const url = window.location.href;
+const dummy = document.createElement('input');
+document.body.appendChild(dummy);
+dummy.value = url;
+dummy.select();
+document.execCommand('copy');
+document.body.removeChild(dummy);
+
+const toast = document.getElementById('share-toast');
+toast.style.display = 'block';
+setTimeout(() => toast.style.display = 'none', 2000);
+}
+
+async function genPoster() {
+const p = document.getElementById('p-input').value;
+if(!p) return;
+const loader = document.getElementById('loader');
+document.getElementById('view-poster').prepend(loader);
+loader.style.display = 'flex';
+try {
+const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ instances: { prompt: `Cinematic artistic Adiyogi 112ft statue: ${p}` } })
+});
+const data = await res.json();
+const b64 = data.predictions?.[0]?.bytesBase64Encoded;
+if(b64) {
+const disp = document.getElementById('poster-display');
+disp.src = `data:image/png;base64,${b64}`;
+disp.style.display = 'block';
+document.getElementById('p-empty').style.display = 'none';
+}
+} catch (e) {} finally { loader.style.display = 'none'; }
+}
+
+async function sendChat() {
+const input = document.getElementById('c-input');
+const txt = input.value.trim();
+if(!txt) return;
+const win = document.getElementById('chat-win');
+const u = document.createElement('div');
+u.className = "bubble user";
+u.innerText = txt;
+win.appendChild(u);
+input.value = "";
+win.scrollTop = win.scrollHeight;
+
+try {
+const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+contents: [{ parts: [{ text: txt }] }],
+systemInstruction: { parts: [{ text: "You are an Isha Guide. Answer questions about Isha Yoga and Adiyogi." }] }
+})
+});
+const data = await res.json();
+const b = document.createElement('div');
+b.className = "bubble bot";
+b.innerText = data.candidates[0].content.parts[0].text;
+win.appendChild(b);
+win.scrollTop = win.scrollHeight;
+} catch (e) {}
+}
+</script>
+</body>
+</html>
